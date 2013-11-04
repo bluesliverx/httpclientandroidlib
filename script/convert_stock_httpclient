@@ -1,11 +1,11 @@
 #!/bin/bash
 # httpclientandroidlib version
-HTTPCLIENTANDROIDLIB_VER=1.1.2
+HTTPCLIENTANDROIDLIB_VER=1.2.0-SNAPSHOT
 # Checkout svn repositories of core/client/cache
-svn checkout http://svn.apache.org/repos/asf/httpcomponents/httpcore/tags/4.2.3/httpcore/ httpcore
-svn checkout http://svn.apache.org/repos/asf/httpcomponents/httpclient/tags/4.2.3/httpclient/ httpclient
-svn checkout http://svn.apache.org/repos/asf/httpcomponents/httpclient/tags/4.2.3/httpclient-cache/ httpclient-cache
-svn checkout http://svn.apache.org/repos/asf/httpcomponents/httpclient/tags/4.2.3/httpmime/ httpmime
+svn checkout http://svn.apache.org/repos/asf/httpcomponents/httpcore/tags/4.3/httpcore/ httpcore
+svn checkout http://svn.apache.org/repos/asf/httpcomponents/httpclient/tags/4.3/httpclient/ httpclient
+svn checkout http://svn.apache.org/repos/asf/httpcomponents/httpclient/tags/4.3/httpclient-cache/ httpclient-cache
+svn checkout http://svn.apache.org/repos/asf/httpcomponents/httpclient/tags/4.3/httpmime/ httpmime
 
 # Delete all .svn directories
 find . -type d -name ".svn" -exec rm -Rf {} +
@@ -32,6 +32,9 @@ CLIENTDIR=`find . -type d | grep '/httpclient/src/main/java/org/apache/http$'`
 CLIENTCACHEDIR=`find . -type d | grep '/httpclient-cache/src/main/java/org/apache/http$'`
 CLIENTMIMEDIR=`find . -type d | grep '/httpmime/src/main/java/org/apache/http$'`
 COREDIR=`find . -type d | grep '/httpcore/src/main/java/org/apache/http$'`
+COREDEPRECATEDDIR=`find . -type d | grep '/httpcore/src/main/java-deprecated/org/apache/http$'`
+cd ${ROOTDIR}/${COREDEPRECATEDDIR}
+cp -R * ${PACKAGEDIR}
 cd ${ROOTDIR}/${COREDIR}
 cp -R * ${PACKAGEDIR}
 cd ${ROOTDIR}/${CLIENTDIR}
@@ -62,9 +65,9 @@ rm impl/auth/KerberosSchemeFactory.java
 rm impl/auth/SPNegoScheme.java
 rm impl/auth/SPNegoSchemeFactory.java
 
-find . -name "*.java" -exec sed -i "/impl\.auth\.KerberosSchemeFactory;/c \/\* KerberosSchemeFactory removed by HttpClient for Android script. \*\/" {} +
-find . -name "*.java" -exec sed -i "/impl\.auth\.SPNegoSchemeFactory;/c \/\* SPNegoSchemeFactory removed by HttpClient for Android script. \*\/" {} +
-find . -name "*.java" -exec sed -i "/impl\.auth\.NegotiateSchemeFactory;/c \/\* NegotiateSchemeFactory removed by HttpClient for Android script. \*\/" {} +
+find . -name "*.java" -exec sed -i "/KerberosSchemeFactory/c \/\* KerberosSchemeFactory removed by HttpClient for Android script. \*\/" {} +
+find . -name "*.java" -exec sed -i "/SPNegoSchemeFactory/c \/\* SPNegoSchemeFactory removed by HttpClient for Android script. \*\/" {} +
+find . -name "*.java" -exec sed -i "/NegotiateSchemeFactory/c \/\* NegotiateSchemeFactory removed by HttpClient for Android script. \*\/" {} +
 find . -name "ProxyClient.java" -exec sed -i -n '1h;1!H;${;g;s/this.authSchemeRegistry.register([^)]*SPNegoSchemeFactory());/\/\* SPNegoSchemeFactory removed by HttpClient for Android script. \*\//g;p;}' {} +
 find . -name "ProxyClient.java" -exec sed -i -n '1h;1!H;${;g;s/this.authSchemeRegistry.register([^)]*KerberosSchemeFactory());/\/\* KerberosSchemeFactory removed by HttpClient for Android script. \*\//g;p;}' {} +
 find . -name "AbstractHttpClient.java" -exec sed -i -n '1h;1!H;${;g;s/registry.register([^)]*SPNegoSchemeFactory());/\/\* SPNegoSchemeFactory removed by HttpClient for Android script. \*\//g;p;}' {} +
@@ -81,6 +84,8 @@ find . -name "*.java" -exec sed -i -n '1h;1!H;${;g;s/Base64.decodeBase64(\([^;]*
 find . -name "*.java" -exec sed -i "/commons\.logging\.Log;/c import ${PACKAGENAME}\.androidextra\.HttpClientAndroidLog;" {} +
 find . -name "*.java" -exec sed -i "/commons\.logging\.LogFactory;/c \/\* LogFactory removed by HttpClient for Android script. \*\/" {} +
 find . -name "*.java" -exec sed -i 's/Log log/HttpClientAndroidLog log/g' {} +
+find . -name "*.java" -exec sed -i 's/Log headerlog/HttpClientAndroidLog headerlog/g' {} +
+find . -name "*.java" -exec sed -i 's/Log wirelog/HttpClientAndroidLog wirelog/g' {} +
 find . -name "*.java" -exec sed -i 's/private final HttpClientAndroidLog \(.*\) = LogFactory.getLog(\(.*\));/public HttpClientAndroidLog \1 = new HttpClientAndroidLog(\2);/g' {} +
 find . -name "*.java" -exec sed -i 's/private final Log \(.*\) = LogFactory.getLog(\(.*\));/public HttpClientAndroidLog \1 = new HttpClientAndroidLog(\2);/g' {} +
 find . -name "*.java" -exec sed -i 's/private final HttpClientAndroidLog log/public HttpClientAndroidLog log/g' {} +
