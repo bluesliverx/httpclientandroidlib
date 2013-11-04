@@ -77,8 +77,12 @@ find . -name "AbstractHttpClient.java" -exec sed -i -n '1h;1!H;${;g;s/registry.r
 # Replace Base64 encoding with android.util.Base64
 find . -name "*.java" -exec sed -i "/commons\.codec\.binary\.Base64;/c import ${PACKAGENAME}\.androidextra.Base64;" {} +
 find . -name "BasicScheme.java" -exec sed -i -n '1h;1!H;${;g;s/Base64.encodeBase64(\([^;]*\));/Base64.encode(\1, Base64.NO_WRAP);/g;p;}' {} +
+find . -name "BasicScheme.java" -exec sed -i -n '1h;1!H;${;g;s/false, Base64\.NO_WRAP/Base64.NO_WRAP/g;p;}' {} +
+find . -name "BasicScheme.java" -exec sed -i -n '1h;1!H;${;g;s/base64codec.encode(\([^;]*\));/Base64.encode(\1, Base64.NO_WRAP);/g;p;}' {} +
 find . -name "NTLMEngineImpl.java" -exec sed -i -n '1h;1!H;${;g;s/Base64.encodeBase64(resp)/Base64.encode(resp, Base64.NO_WRAP)/g;p;}' {} +
 find . -name "*.java" -exec sed -i -n '1h;1!H;${;g;s/Base64.decodeBase64(\([^;]*\));/Base64.decode(\1, Base64.NO_WRAP);/g;p;}' {} +
+find . -name "*.java" -exec sed -i '/new Base64/c \/\* Base64 construction removed by HttpClient for Android script. \*\/' {} +
+find . -name "*.java" -exec sed -i '/Base64 base64codec/c \/\* Base64 construction removed by HttpClient for Android script. \*\/' {} +
 
 # Replace logging stuff
 find . -name "*.java" -exec sed -i "/commons\.logging\.Log;/c import ${PACKAGENAME}\.androidextra\.HttpClientAndroidLog;" {} +
